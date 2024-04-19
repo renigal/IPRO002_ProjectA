@@ -15,20 +15,24 @@ enum NonFictionGenre{
 }
 
 public class NonFictionBook extends Book{
-    NonFictionGenre genre;
+    private NonFictionGenre genre;
 
     public NonFictionBook(BookType type, String title, String author, String ISBN, NonFictionGenre genre){
         super(title, author, ISBN, type);
         this.genre = genre;
     }
 
+    // Getter method to retrieve the genre of the non-fiction book
     public NonFictionGenre getNonFictionGenre(){
         return genre;
     }
 
+    // Override the displayInfo method to provide specific information about the non-fiction book
     @Override
     public void displayInfo(){
+        // Call the displayInfo method of the superclass to display common information
         super.displayInfo();
+        // Display the genre of the non-fiction book
         System.out.println("Genre: " + getNonFictionGenre());
     }
 }

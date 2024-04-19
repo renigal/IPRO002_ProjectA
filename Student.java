@@ -5,81 +5,143 @@ interface User {
     String getType();
 }
 
-public class Student implements User{
+public class Student implements User {
     private String name;
     private Map<String, MediaItem> borrowedItems;
+    private Map<String, MediaItem> availableItems;
 
-    public Student(String name){
+    public Student(String name, Map<String, MediaItem> library){
         this.name = name;
-        this.borrowedItems = new HashMap<>();
+        this.borrowedItems = new HashMap<>(); 
+        this.availableItems = new HashMap<>(library); 
     }
 
+    // Getter method to retrieve the name of the student
     @Override
     public String getName(){
         return name;
     }
 
+    // Getter method to retrieve the type of the user
     @Override
     public String getType(){
         return "Student";
     }
 
-    public void borrowMediaItem(MediaItem mediaItem, Map<String, MediaItem> mediaItems) {
-        if (mediaItems.containsKey(mediaItem.getTitle())) {
-            MediaItem item = mediaItems.get(mediaItem.getTitle());
-            if (item.getIsAvailable()) {
-                if (mediaItem instanceof Book) {
-                    Book book = (Book) mediaItem;
-                    book.borrowMediaItem();
-                } else if (mediaItem instanceof DVD) {
-                    DVD dvd = (DVD) mediaItem;
-                    dvd.borrowMediaItem();
-                } else if (mediaItem instanceof VinylRecord) {
-                    VinylRecord vinylRecord = (VinylRecord) mediaItem;
-                    vinylRecord.borrowMediaItem();
+    // Method for a student to borrow a media item
+    public void borrowMediaItem(String title) {
+        boolean found = false;
+        // Go through the available items
+        for (Map.Entry<String, MediaItem> entry : availableItems.entrySet()) {
+            String mediaTitle = entry.getKey();
+            MediaItem mediaItem = entry.getValue();
+            // Check if the title matches and the item is available
+            if (mediaTitle.equalsIgnoreCase(title)) {
+                if (mediaItem.getIsAvailable()) {
+                    // If available, borrow the item
+                    mediaItem.borrowMediaItem();
+                    borrowedItems.put(mediaTitle, mediaItem);
+                    System.out.println(name + " has borrowed the media item: " + mediaTitle);
+                } else {
+                    // If not available, inform the student
+                    System.out.println("Sorry, " + mediaTitle + " is not available for borrowing.");
                 }
-                borrowedItems.put(mediaItem.getTitle(), mediaItem);
-                System.out.println(name + " has borrowed the media item: " + mediaItem.getTitle());
-            } else {
-                System.out.println("Sorry, " + mediaItem.getTitle() + " is not available for borrowing.");
+                found = true;
+                break;
             }
-        } else {
-            System.out.println("The media item " + mediaItem.getTitle() + " is not available in the library.");
+        }
+        if (!found) {
+            // If title not found in available items, inform the student
+            System.out.println("The media item '" + title + "' is not available in the library.");
         }
     }
-
+    
+    // Method for a student to return a borrowed media item
     public void returnMediaItem(String title) {
-        if (borrowedItems.containsKey(title)) {
-            MediaItem item = borrowedItems.get(title);
-            item.returnMediaItem();
-            borrowedItems.remove(title);
-            System.out.println(name + " has returned the media item: " + title);
-        } else {
-            System.out.println("You have not borrowed the media item: " + title);
+        boolean found = false;
+        // Go through the available items
+        for (Map.Entry<String, MediaItem> entry : borrowedItems.entrySet()) {
+            String borrowedTitle = entry.getKey();
+            MediaItem borrowedItem = entry.getValue();
+            // Check if the title matches the borrowed item (ignores capital and lowercase)
+            if (borrowedTitle.equalsIgnoreCase(title)) {
+                // Return the borrowed item
+                borrowedItem.returnMediaItem();
+                borrowedItems.remove(borrowedTitle);
+                System.out.println(name + " has returned the media item: " + borrowedTitle);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            // If title not found in borrowed items, inform the student
+            System.out.println("You have not borrowed the media item '" + title + "'.");
         }
     }
-
-    public void searchMediaItems(List<MediaItem> mediaItems) {
+    
+    // Method for a student to view available media items in the library
+    public void viewAvailableMediaItems(Map<String, MediaItem> library) {
         System.out.println("Available Media Items:");
         List<MediaItem> availableItems = new ArrayList<>();
-    
+        
         // Filter available items
-        for (MediaItem item : mediaItems) {
-          if (item.getIsAvailable()) {
-            availableItems.add(item);
-          }
+        for (MediaItem item : library.values()) {
+            if (item.getIsAvailable()) {
+                availableItems.add(item);
+            }
         }
-    
+        
         // Sort available items by title
         Collections.sort(availableItems, (item1, item2) -> item1.getTitle().compareTo(item2.getTitle()));
-    
+        
         // Display available items
         if (availableItems.isEmpty()) {
-          System.out.println("No media items are currently available for borrowing.");
+            System.out.println("No media items are currently available for borrowing.");
         } else {
-          for (MediaItem item : availableItems) {
-            System.out.println("- " + item.getTitle());
-          }
+            for (MediaItem item : availableItems) {
+                String itemType = "";
+                // Determine the type of the item
+                if (item instanceof FictionBook) {
+                    itemType = "Fiction Book";
+                } else if (item instanceof NonFictionBook) {
+                    itemType = "Non-Fiction Book";
+                } else if (item instanceof DVD) {
+                    itemType = "DVD";
+                } else if (item instanceof VinylRecord) {   
+                    itemType = "Vinyl Record";
+                }
+                System.out.println("- " + item.getTitle() + " (" + itemType + ")");
+            }
         }
-      }
+    }
+    
+    // Method for a student to display borrowed media items
+    public void displayBorrowedItems() {
+        if (borrowedItems.isEmpty()) {
+            System.out.println("You haven't borrowed any media items.");
+        } else {
+            System.out.println("Borrowed Media Items:");
+            for (MediaItem item : borrowedItems.values()) {
+                System.out.println("- " + item.getTitle());
+            }
+        }
+    }
+
+    // Method for a student to view details of a media item
+    public void viewMediaItemDetails(String title, Map<String, MediaItem> library) {
+        boolean found = false;
+        // Loop through the library to find a title
+        for (MediaItem item : library.values()) {
+            if (item.getTitle().equalsIgnoreCase(title)) {
+                // Display details of the found item
+                item.displayInfo();
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            // If title not found, inform the student
+            System.out.println("Media item with title '" + title + "' not found.");
+        }
+    }
 }

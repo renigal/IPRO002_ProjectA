@@ -1,3 +1,4 @@
+// Enum to represent genres of fiction books
 enum FictionGenre{
     HORROR,
     MYSTERY,
@@ -5,24 +6,29 @@ enum FictionGenre{
     SCIENCE_FICTION,
     THRILLER,
     FANTASY,
-    HISTORY
+    HISTORY,
+    DRAMA
 }
 
 public class FictionBook extends Book{
-    FictionGenre genre;
+    private FictionGenre genre;
 
     public FictionBook(BookType type, String title, String author, String ISBN, FictionGenre genre){
         super(title, author, ISBN, type);
         this.genre = genre;
     }
 
+    // Getter method to retrieve the genre of the fiction book
     public FictionGenre getFictionGenre(){
         return genre;
     }
     
+    // Override the displayInfo method to provide specific information about the fiction book
     @Override
     public void displayInfo(){
+        // Call the displayInfo method of the superclass to display common information
         super.displayInfo();
+        // Display the genre of the fiction book
         System.out.println("Genre: " + getFictionGenre());
     }
 }

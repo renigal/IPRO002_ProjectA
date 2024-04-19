@@ -8,16 +8,20 @@ public class VinylRecord extends MediaItem {
         this.numberOfTracks = numberOfTracks;
     }
 
+    // Getter method to retrieve the artist of the vinyl record
     public String getArtist(){
         return artist;
     }
 
+    // Getter method to retrieve the number of tracks of the vinyl record
     public int getNumberOfTracks(){
         return numberOfTracks;
     }
 
+    // Override the displayInfo method to provide specific information about the vinyl record
     @Override
     public void displayInfo(){
+        // Display the title, artist, and number of tracks of the vinyl record
         System.out.println("Title: " + getTitle() + ", Artist: " + getArtist() + ", Number of Tracks: " + getNumberOfTracks());
     }
 }
