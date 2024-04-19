@@ -26,10 +26,10 @@ public class Test {
         // Student borrows a book
         student.borrowMediaItem("The Great Gatsby");
         
-        // Display borrowed items
+        // Display borrowed items 
         student.displayBorrowedItems();
         
-        // Display available media items after borrowing
+        // Display available media items after borrowing (the great gatsby disappear from list)
         student.viewAvailableMediaItems(library);
         
         // Student tries to borrow a book that's not available
@@ -38,16 +38,16 @@ public class Test {
         // Student returns a book
         student.returnMediaItem("The Great Gatsby");
         
-        // Display borrowed items after returning
+        // Display borrowed items after returning 
         student.displayBorrowedItems();
         
-        // Display available media items after returning
+        // Display available media items after returning (the great gatsby return, inception disappear)
         student.viewAvailableMediaItems(library);
         
         // Librarian lists all media items
         librarian.listAllMediaItems(library);
         
-        // Librarian removes a media item
+        // Librarian removes a media item (staff can't remove 'incetion', since its still being borrowed)
         librarian.removeMediaItem("Inception", library);
         
         // Librarian lists all media items after removal
