@@ -30,4 +30,13 @@ public class Staff implements User{
             System.out.println(title+ " is not available in the library.");
         }
     }
+
+    public void listAllMediaItems(Map<String, MediaItem> mediaItems) {
+        System.out.println("List of all Media Items:");
+        for (Map.Entry<String, MediaItem> entry : mediaItems.entrySet()) {
+            MediaItem item = entry.getValue();
+            String availability = item.getIsAvailable() ? "Available" : "Borrowed";
+            System.out.println("- " + item.getTitle() + " (" + availability + ")");
+        }
+    }
 }
