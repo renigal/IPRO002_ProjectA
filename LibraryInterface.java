@@ -20,7 +20,7 @@ public class LibraryInterface {
         library.put(vinyl1.getTitle(), vinyl1);
         library.put(vinyl2.getTitle(), vinyl2);
 
-        LoginManager loginManager = new LoginManager();
+        Login loginManager = new Login();
     
 
         boolean loggedIn = false;
@@ -48,7 +48,7 @@ public class LibraryInterface {
                     return;
                 }
                 
-                if (loginManager.authentication(username, password)){
+                if (loginManager.authenticate(username, password)){
                     loggedIn = true;
                     
                     userType = loginManager.getUserType(username);

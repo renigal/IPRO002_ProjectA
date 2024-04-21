@@ -3,6 +3,10 @@ import java.util.*;
 public class Staff implements User {
     private String name;
 
+    public Staff(String name){
+        this.name=name;
+    }
+
     // Getter method to retrieve the name of the staff member
     @Override
     public String getName(){
