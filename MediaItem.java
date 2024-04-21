@@ -1,4 +1,4 @@
-public class MediaItem {
+public abstract class MediaItem {
     private String title;
     protected boolean isAvailable;
 
