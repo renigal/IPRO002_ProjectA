@@ -1,10 +1,9 @@
 import java.util.*;
 
-// This class serves as the entry point for the library management system
 public class LibraryInterface {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
-        Map<String, MediaItem> library = new HashMap<>(); // Initialize a HashMap to store media items
+        Map<String, MediaItem> library = new HashMap<>();
 
         // Sample Library
         // Create sample media items and add them to the library
@@ -12,166 +11,165 @@ public class LibraryInterface {
         MediaItem book2 = new NonFictionBook(BookType.NON_FICTION, "Sapiens: A Brief History of Humankind", "Yuval Noah Harari", "9780062316097", NonFictionGenre.HISTORY);
         MediaItem dvd1 = new DVD("Inception", "Christopher Nolan", "2010");
         MediaItem vinyl1 = new VinylRecord("Abbey Road", "The Beatles", 17);
+        MediaItem vinyl2= new VinylRecord("Push Ups", "Drake", 1);
 
         // Add sample media items to the library
         library.put(book1.getTitle(), book1);
         library.put(book2.getTitle(), book2);
         library.put(dvd1.getTitle(), dvd1);
         library.put(vinyl1.getTitle(), vinyl1);
+        library.put(vinyl2.getTitle(), vinyl2);
 
-        Login login = new Login();
-        Map<String, Student> students = new HashMap<>();    
+        LoginManager loginManager = new LoginManager();
+    
 
-        int choice;
+        boolean loggedIn = false;
+        String userType = "";
+        String quitCommand = "QUIT";
 
-        // Display main menu and handle user choice
-        do {
-            try {
-                System.out.println("\nLibrary Management System");
-                System.out.println("1. Login as Student");
-                System.out.println("2. Login as Staff");
-                System.out.println("3. Exit");
+        do{
+            try{
+                System.out.println("--------------------- Welcome to  the Library ---------------------");
+                System.out.println("------------------ Please login to use the System ------------------");
+                System.out.println("------------------- Type 'QUIT' anytime to leave -------------------");
+                System.out.print("Please enter Username: ");
+                String username = scanner.next();
 
-                choice = scanner.nextInt();
-                scanner.nextLine();
-
-                switch (choice) {
-                    case 1:
-                        loginStudent(scanner, library, login, students); // Login as student
-                        break;
-                    case 2:
-                        loginStaff(scanner, library, login, students); // Login as staff
-                        break;
-                    case 3:
-                        System.out.println("Exiting Library System");
-                        break;
-                    default:
-                        System.out.println("Invalid Choice!");
+                if (username.equals(quitCommand)){
+                    System.out.println("Exiting program... Goodbye");
+                    return;
                 }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                scanner.next();
-                choice = 0; 
-            }
-        } while (choice != 3);
 
-        scanner.close();
+                System.out.print("Please enter password: ");
+                String password = scanner.next();
+
+                if (password.equals(quitCommand)){
+                    System.out.println("Exiting program... Goodbye");
+                    return;
+                }
+                
+                if (loginManager.authentication(username, password)){
+                    loggedIn = true;
+                    
+                    userType = loginManager.getUserType(username);
+                    System.out.println("------------------------- Login Successful -------------------------");
+
+                    if (userType.equals("Student")){
+                        Student student = new Student(username,library);
+                        displayStudentMenu(scanner, student, library);
+                    } else if (userType.equals("Staff")){
+                        Staff staff = new Staff(username);
+                        displayStaffMenu(scanner,staff, library);
+                    }
+                } else {
+                    System.out.println("Invalid username or password. Please try again.");
+                }
+
+            } catch (InputMismatchException e){
+                System.out.println("Invalid input. Please enter a valid username and password.");
+            }
+        } while (!loggedIn);
     }
 
-    // Method for student menu
-    private static void studentMenu(Scanner scanner, Student student, Map<String, MediaItem> library, String username) {
-        int option;
-
-        // Display student menu and handle user choice
-        do {
+    private static void displayStudentMenu(Scanner scanner, Student student, Map<String, MediaItem> library){
+        int choice =0;
+        do{
             try{
-                System.out.println("\nStudent Menu:");
+                System.out.println("----- Student Menu -----");
                 System.out.println("1. Borrow Media Item");
                 System.out.println("2. Return Media Item");
                 System.out.println("3. View Available Media Items");
                 System.out.println("4. View Borrowed Items");
                 System.out.println("5. Display Media Item Details");
                 System.out.println("6. Logout");
-                System.out.println("Enter choice: ");
+                System.out.print("Please enter choice: ");
+                choice = scanner.nextInt();
 
-                option = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
-
-                switch(option) {
+                switch(choice){
                     case 1:
-                        System.out.println("Enter a media name to borrow: ");
+                        System.out.println("Enter a media to borrow:");
+                        scanner.nextLine();
                         String mediaName = scanner.nextLine();
-                        student.borrowMediaItem(mediaName, username); // Borrow media item
+                        student.borrowMediaItem(mediaName);
                         break;
                     case 2:
-                        System.out.println("Enter a title to return: ");
-                        String title = scanner.nextLine();
-                        student.returnMediaItem(title); // Return media item
+                        System.out.println("Enter a title to return:");
+                        String mediaTitle = scanner.nextLine();
+                        scanner.nextLine();
+                        student.returnMediaItem(mediaTitle);
                         break;
                     case 3:
-                        student.viewAvailableMediaItems(library); // View available media items
+                        student.viewAvailableMediaItems(library);
                         break;
                     case 4:
-                        student.displayBorrowedItems(); // View borrowed items
+                        student.displayBorrowedItems();
                         break;
                     case 5:
-                        System.out.println("Enter title of media item:");
-                        String itemName = scanner.nextLine();
-                        student.viewMediaItemDetails(itemName, library); // View media item details
+                        System.out.println("Enter media name: ");
+                        String media = scanner.nextLine();
+                        scanner.nextLine();
+                        student.viewMediaItemDetails(media, library);
                         break;
                     case 6:
                         System.out.println("Logging out...");
                         break;
                     default:
-                        System.out.println("Invalid Choice!");
+                        System.out.println("Invalid choice");
+                }
+        
+            }catch (InputMismatchException e){
+                System.out.println("Invalid input! Please enter a number.");
+            }
+        } while (choice != 6);
+    }
+
+    private static void displayStaffMenu(Scanner scanner, Staff staff, Map<String, MediaItem> library){
+        int option = 0;
+    
+        do {
+            try {
+                System.out.println("----- Staff Menu -----");
+                System.out.println("1. Add Media Item");
+                System.out.println("2. Remove Media Item");
+                System.out.println("3. List all Media Items");
+                System.out.println("4. Display Media Item Details");
+                System.out.println("5. Logout");
+                System.out.println("Please enter choice: ");
+                option = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+    
+                switch (option) {
+                    case 1:
+                        addMediaItemMenu(scanner, staff, library);
+                        break;
+                    case 2:
+                        System.out.println("Enter media item name to remove:");
+                        String title = scanner.nextLine();
+                        staff.removeMediaItem(title, library);
+                        break;
+                    case 3:
+                        staff.listAllMediaItems(library);
+                        break;
+                    case 4:
+                        System.out.println("Enter media name: ");
+                        String media = scanner.nextLine();
+                        staff.viewMediaItemDetails(media, library);
+                        break;
+                    case 5:
+                        System.out.println("Logging out...");
+                        break;
+                    default:
+                        System.out.println("Invalid Input! Please enter a number.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                scanner.next();
-                option = 0; 
+                System.out.println("Invalid input. Please enter a number!");
+                scanner.nextLine(); // Consume newline
             }
-        } while (option != 6);
+        } while (option != 5);
     }
 
-
-    // Method for staff login
-    private static void staffMenu(Scanner scanner, Staff staff, Map<String, MediaItem> library, Map<String, Student> students){
-                int action;
-
-                // Display staff menu and handle user choice
-                do {
-                    try{
-                    System.out.println("\nStaff Menu");
-                    System.out.println("1. Add Media Item");
-                    System.out.println("2. Remove Media Item");
-                    System.out.println("3. List all Media Items");
-                    System.out.println("4. Display Media Item Details");
-                    System.out.println("5. Logout");
-                    System.out.println("Enter choice: ");
-    
-                    action = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
-    
-                    switch (action) {
-                        case 1:
-                            addMediaItemMenu(scanner, staff, library); // Add media item
-                            break;
-                        case 2:
-                            removeMediaItem(scanner, staff, library); // Remove media item
-                            break;
-                        case 3:
-                            staff.listAllMediaItems(library, students); // List all media items
-                            break;
-                        case 4:
-                            System.out.println("Enter title of media item:");
-                            String itemName = scanner.nextLine();
-                            staff.viewMediaItemDetails(itemName, library); // View details of a media item
-                            break;
-                        case 5:
-                            System.out.println("Staff logged out");
-                            return; // Exit the method and return to main menu
-                        default:
-                            System.out.println("Invalid choice!");
-                    }
-                } catch(InputMismatchException e){
-                    System.out.println("Invalid input. Please enter a number.");
-                scanner.next(); // Clear the invalid input
-                action = 0;
-                }
-                } while (action != 5);
-    }
-    
-    // Method to remove a media item by staff
-    private static void removeMediaItem(Scanner scanner, Staff staff, Map<String, MediaItem> library){
-        System.out.println("Enter Media Item Title:");
-        String title = scanner.nextLine();
-
-        staff.removeMediaItem(title, library); // Remove media item
-    }
-
-    // Method to display menu for adding media items by staff
     private static void addMediaItemMenu(Scanner scanner, Staff staff, Map<String, MediaItem> library){
-        int mediaTypeChoice;
+        int action;
 
         System.out.println("\nAdd Media Item:");
         System.out.println("1. Add Fiction Book");
@@ -181,10 +179,10 @@ public class LibraryInterface {
         System.out.println("5. Back to Staff Menu");
         System.out.println("Enter choice:");
 
-        mediaTypeChoice = scanner.nextInt();
+        action = scanner.nextInt();
         scanner.nextLine(); // Consume newline
 
-        switch (mediaTypeChoice){
+        switch (action){
             case 1:
                 addFictionBook(scanner, staff, library); // Add fiction book
                 break;
@@ -292,47 +290,5 @@ public class LibraryInterface {
         scanner.nextLine(); // Consume newline
 
         staff.addMediaItem(title, artist, numoftracks, library); // Add vinyl record
-    }
-
-    private static void loginStudent(Scanner scanner, Map<String, MediaItem> library, Login login, Map<String, Student> students){
-        System.out.println("Enter Username:");
-        String username = scanner.nextLine();
-
-        System.out.println("Enter Password:");
-        String password = scanner.nextLine();
-
-        if (login.authenticate(username, password)){
-            String userType = login.getUserType(username);
-            if ("Student" == userType){
-                System.out.println("Login Successful");
-                Student student = new Student(username, library);
-                studentMenu(scanner, student, library, username);
-            } else {
-                System.out.println("Invalid User Type");
-            }
-        } else {
-            System.out.println("Invalid username or password");
-        }
-    }
-
-    private static void loginStaff(Scanner scanner, Map<String, MediaItem> library, Login login, Map<String, Student> students){
-        System.out.println("Enter Username:");
-        String username = scanner.nextLine();
-
-        System.out.println("Enter Password:");
-        String password = scanner.nextLine();
-
-        if (login.authenticate(username, password)){
-            String userType = login.getUserType(username);
-            if("Staff" == userType){
-                System.out.println("Login Successful");
-                Staff staff = new Staff(username, library);
-                staffMenu(scanner, staff, library, students);
-            } else {
-                System.out.println("Invalid User Type");
-            }
-        } else {
-            System.out.println("Invalid username or password");
-        }
     }
 }
